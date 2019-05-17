@@ -26,6 +26,8 @@ github.com/Azure/go-autorest v11.2.8+incompatible/go.mod h1:r+4oMnoxhatjLLJ6zxSW
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/DataDog/datadog-go v0.0.0-20180702141236-ef3a9daf849d h1:qGaiqpKg/VnndIRJu9Z0jdVVXebhTxzd6sDP//mh3/E=
 github.com/DataDog/datadog-go v0.0.0-20180702141236-ef3a9daf849d/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
+github.com/DataDog/zstd v1.4.0 h1:vhoV+DUHnRZdKW1i5UMjAk2G4JY8wN4ayRfYDNdEhwo=
+github.com/DataDog/zstd v1.4.0/go.mod h1:1jcaCB/ufaK+sKp1NBhlGmpz41jOoPQ35bpF36t7BBo=
 github.com/Jeffail/gabs v1.1.0 h1:kw5zCcl9tlJNHTDme7qbi21fDHZmXrnjMoXos3Jw/NI=
 github.com/Jeffail/gabs v1.1.0/go.mod h1:6xMvQMK4k33lb7GUUpaAPh6nKMmemQeg5d4gn7/bOXc=
 github.com/Masterminds/squirrel v0.0.0-20190107164353-fa735ea14f09 h1:enWVS77aJkLWVIUExiqF6A8eWTVzCXUKUvkST3/wyKI=

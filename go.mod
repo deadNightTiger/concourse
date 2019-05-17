@@ -13,6 +13,7 @@ require (
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/Azure/go-autorest v11.2.8+incompatible // indirect
 	github.com/DataDog/datadog-go v0.0.0-20180702141236-ef3a9daf849d
+	github.com/DataDog/zstd v1.4.0
 	github.com/Jeffail/gabs v1.1.0 // indirect
 	github.com/Masterminds/squirrel v0.0.0-20190107164353-fa735ea14f09
 	github.com/Microsoft/go-winio v0.4.11 // indirect

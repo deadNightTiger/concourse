@@ -2,7 +2,6 @@ package image_test
 
 import (
 	"archive/tar"
-	"compress/gzip"
 	"context"
 	"crypto/sha256"
 	"errors"
@@ -12,6 +11,7 @@ import (
 
 	"code.cloudfoundry.org/lager"
 	"code.cloudfoundry.org/lager/lagertest"
+	"github.com/DataDog/zstd"
 	"github.com/cloudfoundry/bosh-cli/director/template"
 	"github.com/concourse/concourse/atc"
 	"github.com/concourse/concourse/atc/creds"
@@ -643,8 +643,8 @@ var _ = Describe("Image", func() {
 func tgzStreamWith(metadata string) io.ReadCloser {
 	buffer := gbytes.NewBuffer()
 
-	gzWriter := gzip.NewWriter(buffer)
-	tarWriter := tar.NewWriter(gzWriter)
+	zstdWriter := zstd.NewWriter(buffer)
+	tarWriter := tar.NewWriter(zstdWriter)
 
 	err := tarWriter.WriteHeader(&tar.Header{
 		Name: "metadata.json",
@@ -659,7 +659,7 @@ func tgzStreamWith(metadata string) io.ReadCloser {
 	err = tarWriter.Close()
 	Expect(err).NotTo(HaveOccurred())
 
-	err = gzWriter.Close()
+	err = zstdWriter.Close()
 	Expect(err).NotTo(HaveOccurred())
 
 	return buffer
