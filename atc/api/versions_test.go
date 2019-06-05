@@ -260,7 +260,7 @@ var _ = Describe("Versions API", func() {
 					})
 				})
 
-				Context("when getting the versions succeeds", func() {
+				FContext("when getting the versions succeeds", func() {
 					var returnedVersions []atc.ResourceVersion
 
 					BeforeEach(func() {
@@ -271,6 +271,7 @@ var _ = Describe("Versions API", func() {
 								Enabled: true,
 								Version: atc.Version{
 									"some": "version",
+									"ref":  "foo",
 								},
 								Metadata: []atc.MetadataField{
 									{
@@ -284,6 +285,7 @@ var _ = Describe("Versions API", func() {
 								Enabled: false,
 								Version: atc.Version{
 									"some": "version",
+									"ref":  "blah",
 								},
 								Metadata: []atc.MetadataField{
 									{
@@ -297,23 +299,61 @@ var _ = Describe("Versions API", func() {
 						fakeResource.VersionsReturns(returnedVersions, db.Pagination{}, true, nil)
 					})
 
-					It("returns 200 OK", func() {
-						Expect(response.StatusCode).To(Equal(http.StatusOK))
+					Context("when params include version fields filter", func() {
+
+						Context("when field filter has one valid field", func() {
+
+							FContext("when the field value partily matches", func() {
+								BeforeEach(func() {
+									queryParams = "?filter=ref:foo&filter=ref:blah"
+								})
+
+								It("returns 200 OK", func() {
+									Expect(response.StatusCode).To(Equal(http.StatusOK))
+								})
+
+								It("returns content type application/json", func() {
+									Expect(response.Header.Get("Content-type")).To(Equal("application/json"))
+								})
+
+							})
+
+							Context("when field filter does not match", func() {
+								BeforeEach(func() {
+									queryParams = "?filter=some:blah"
+								})
+
+								It("returns 204 no content", func() {
+									Expect(response.StatusCode).To(Equal(http.StatusNoContent))
+								})
+							})
+
+						})
+
 					})
 
-					It("returns content type application/json", func() {
-						Expect(response.Header.Get("Content-type")).To(Equal("application/json"))
-					})
+					Context("when params include pagination", func() {
+						BeforeEach(func() {
+							queryParams = "?since=5&limit=2"
+						})
 
-					It("returns the json", func() {
-						body, err := ioutil.ReadAll(response.Body)
-						Expect(err).NotTo(HaveOccurred())
+						It("returns 200 OK", func() {
+							Expect(response.StatusCode).To(Equal(http.StatusOK))
+						})
 
-						Expect(body).To(MatchJSON(`[
+						It("returns content type application/json", func() {
+							Expect(response.Header.Get("Content-type")).To(Equal("application/json"))
+						})
+
+						It("returns the json", func() {
+							body, err := ioutil.ReadAll(response.Body)
+							Expect(err).NotTo(HaveOccurred())
+
+							Expect(body).To(MatchJSON(`[
 					{
 						"id": 4,
 						"enabled": true,
-						"version": {"some":"version"},
+						"version": {"some":"version", "ref":"foo"},
 						"metadata": [
 							{
 								"name":"some",
@@ -324,7 +364,7 @@ var _ = Describe("Versions API", func() {
 					{
 						"id":2,
 						"enabled": false,
-						"version": {"some":"version"},
+						"version": {"some":"version", "ref":"blah"},
 						"metadata": [
 							{
 								"name":"some",
@@ -333,6 +373,7 @@ var _ = Describe("Versions API", func() {
 						]
 					}
 				]`))
+						})
 					})
 
 					Context("when next/previous pages are available", func() {

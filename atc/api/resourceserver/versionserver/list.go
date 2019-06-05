@@ -25,6 +25,15 @@ func (s *Server) ListResourceVersions(pipeline db.Pipeline) http.Handler {
 			limit int
 		)
 
+		err = r.ParseForm()
+		if err != nil {
+			logger.Error("failed-to-parse-request-form", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		fields = r.Form["filter"]
+
 		resourceName := r.FormValue(":resource_name")
 		teamName := r.FormValue(":team_name")
 

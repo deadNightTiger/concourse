@@ -46,7 +46,7 @@ type Resource interface {
 	CurrentPinnedVersion() atc.Version
 
 	ResourceConfigVersionID(atc.Version) (int, bool, error)
-	Versions(page Page) ([]atc.ResourceVersion, Pagination, bool, error)
+	Versions(page Page, version Version) ([]atc.ResourceVersion, Pagination, bool, error)
 	SaveUncheckedVersion(atc.Version, ResourceConfigMetadataFields, ResourceConfig, creds.VersionedResourceTypes) (bool, error)
 
 	EnableVersion(rcvID int) error
@@ -340,7 +340,7 @@ func (r *resource) CurrentPinnedVersion() atc.Version {
 	return nil
 }
 
-func (r *resource) Versions(page Page) ([]atc.ResourceVersion, Pagination, bool, error) {
+func (r *resource) Versions(page Page, version Version) ([]atc.ResourceVersion, Pagination, bool, error) {
 	query := `
 		SELECT v.id, v.version, v.metadata, v.check_order,
 			NOT EXISTS (
