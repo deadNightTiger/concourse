@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"code.cloudfoundry.org/lager"
 	"github.com/concourse/concourse/atc"
@@ -32,7 +33,12 @@ func (s *Server) ListResourceVersions(pipeline db.Pipeline) http.Handler {
 			return
 		}
 
-		fields = r.Form["filter"]
+		fields := r.Form["filter"]
+		versionFilter := make(atc.Version)
+		for _, field := range fields {
+			vs := strings.SplitN(field, ":", 2)
+			versionFilter[vs[0]] = vs[1]
+		}
 
 		resourceName := r.FormValue(":resource_name")
 		teamName := r.FormValue(":team_name")
@@ -75,7 +81,7 @@ func (s *Server) ListResourceVersions(pipeline db.Pipeline) http.Handler {
 			From:  from,
 			To:    to,
 			Limit: limit,
-		})
+		}, versionFilter)
 		if err != nil {
 			logger.Error("failed-to-get-resource-config-versions", err)
 			w.WriteHeader(http.StatusInternalServerError)

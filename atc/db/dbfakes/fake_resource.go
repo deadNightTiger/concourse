@@ -2,13 +2,13 @@
 package dbfakes
 
 import (
-	"sync"
-	"time"
+	sync "sync"
+	time "time"
 
-	"code.cloudfoundry.org/lager"
-	"github.com/concourse/concourse/atc"
-	"github.com/concourse/concourse/atc/creds"
-	"github.com/concourse/concourse/atc/db"
+	lager "code.cloudfoundry.org/lager"
+	atc "github.com/concourse/concourse/atc"
+	creds "github.com/concourse/concourse/atc/creds"
+	db "github.com/concourse/concourse/atc/db"
 )
 
 type FakeResource struct {
@@ -365,10 +365,11 @@ type FakeResource struct {
 	unpinVersionReturnsOnCall map[int]struct {
 		result1 error
 	}
-	VersionsStub        func(db.Page) ([]atc.ResourceVersion, db.Pagination, bool, error)
+	VersionsStub        func(db.Page, atc.Version) ([]atc.ResourceVersion, db.Pagination, bool, error)
 	versionsMutex       sync.RWMutex
 	versionsArgsForCall []struct {
 		arg1 db.Page
+		arg2 atc.Version
 	}
 	versionsReturns struct {
 		result1 []atc.ResourceVersion
@@ -2196,16 +2197,17 @@ func (fake *FakeResource) UnpinVersionReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeResource) Versions(arg1 db.Page) ([]atc.ResourceVersion, db.Pagination, bool, error) {
+func (fake *FakeResource) Versions(arg1 db.Page, arg2 atc.Version) ([]atc.ResourceVersion, db.Pagination, bool, error) {
 	fake.versionsMutex.Lock()
 	ret, specificReturn := fake.versionsReturnsOnCall[len(fake.versionsArgsForCall)]
 	fake.versionsArgsForCall = append(fake.versionsArgsForCall, struct {
 		arg1 db.Page
-	}{arg1})
-	fake.recordInvocation("Versions", []interface{}{arg1})
+		arg2 atc.Version
+	}{arg1, arg2})
+	fake.recordInvocation("Versions", []interface{}{arg1, arg2})
 	fake.versionsMutex.Unlock()
 	if fake.VersionsStub != nil {
-		return fake.VersionsStub(arg1)
+		return fake.VersionsStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3, ret.result4
@@ -2220,17 +2222,17 @@ func (fake *FakeResource) VersionsCallCount() int {
 	return len(fake.versionsArgsForCall)
 }
 
-func (fake *FakeResource) VersionsCalls(stub func(db.Page) ([]atc.ResourceVersion, db.Pagination, bool, error)) {
+func (fake *FakeResource) VersionsCalls(stub func(db.Page, atc.Version) ([]atc.ResourceVersion, db.Pagination, bool, error)) {
 	fake.versionsMutex.Lock()
 	defer fake.versionsMutex.Unlock()
 	fake.VersionsStub = stub
 }
 
-func (fake *FakeResource) VersionsArgsForCall(i int) db.Page {
+func (fake *FakeResource) VersionsArgsForCall(i int) (db.Page, atc.Version) {
 	fake.versionsMutex.RLock()
 	defer fake.versionsMutex.RUnlock()
 	argsForCall := fake.versionsArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeResource) VersionsReturns(result1 []atc.ResourceVersion, result2 db.Pagination, result3 bool, result4 error) {

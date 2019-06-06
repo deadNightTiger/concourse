@@ -46,7 +46,7 @@ type Resource interface {
 	CurrentPinnedVersion() atc.Version
 
 	ResourceConfigVersionID(atc.Version) (int, bool, error)
-	Versions(page Page, version Version) ([]atc.ResourceVersion, Pagination, bool, error)
+	Versions(page Page, versionFilter atc.Version) ([]atc.ResourceVersion, Pagination, bool, error)
 	SaveUncheckedVersion(atc.Version, ResourceConfigMetadataFields, ResourceConfig, creds.VersionedResourceTypes) (bool, error)
 
 	EnableVersion(rcvID int) error
@@ -340,7 +340,7 @@ func (r *resource) CurrentPinnedVersion() atc.Version {
 	return nil
 }
 
-func (r *resource) Versions(page Page, version Version) ([]atc.ResourceVersion, Pagination, bool, error) {
+func (r *resource) Versions(page Page, versionFilter atc.Version) ([]atc.ResourceVersion, Pagination, bool, error) {
 	query := `
 		SELECT v.id, v.version, v.metadata, v.check_order,
 			NOT EXISTS (
@@ -353,6 +353,11 @@ func (r *resource) Versions(page Page, version Version) ([]atc.ResourceVersion, 
 		FROM resource_config_versions v, resources r
 		WHERE r.id = $1 AND r.resource_config_scope_id = v.resource_config_scope_id AND v.check_order != 0
 	`
+
+	for key, value := range versionFilter {
+		field := fmt.Sprintf("{\"%s\": \"%s\"}", key, value)
+		query += ` AND version @> '` + field + `'`
+	}
 
 	var rows *sql.Rows
 	var err error
