@@ -606,7 +606,7 @@ viewLogs { lines } timestamps hl timeZone id =
                     { timestamps = timestamps
                     , highlight = hl
                     , id = id
-                    , lineNo = idx + 1
+                    , lineNo = idx
                     , line = line
                     , timeZone = timeZone
                     }
@@ -631,10 +631,10 @@ viewTimestampedLine { timestamps, highlight, id, lineNo, line, timeZone } =
                     False
 
                 HighlightLine hlId hlLine ->
-                    hlId == id && hlLine == lineNo
+                    hlId == id && hlLine == (lineNo + 1)
 
                 HighlightRange hlId hlLine1 hlLine2 ->
-                    hlId == id && lineNo >= hlLine1 && lineNo <= hlLine2
+                    hlId == id && (lineNo + 1) >= hlLine1 && (lineNo + 1) <= hlLine2
 
         ts =
             Dict.get lineNo timestamps
@@ -644,11 +644,11 @@ viewTimestampedLine { timestamps, highlight, id, lineNo, line, timeZone } =
             [ ( "timestamped-line", True )
             , ( "highlighted-line", highlighted )
             ]
-        , Html.Attributes.id <| id ++ ":" ++ String.fromInt lineNo
+        , Html.Attributes.id <| id ++ ":" ++ String.fromInt (lineNo + 1)
         ]
         [ viewTimestamp
             { id = id
-            , line = lineNo
+            , line = lineNo + 1
             , date = ts
             , timeZone = timeZone
             }
