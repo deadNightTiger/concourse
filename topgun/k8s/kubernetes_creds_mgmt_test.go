@@ -134,6 +134,25 @@ var _ = Describe("Kubernetes credential management", func() {
 		})
 	})
 
+	Context("one-off build", func() {
+		It("runs the one-off build successfully", func() {
+			By("creating the secret in the main team")
+			createCredentialSecret(releaseName, "some-secret", "main", map[string]string{"value": "mysecret"})
+
+			By("successfully running the one-off build")
+			fly.Run("execute",
+				"-c", "../tasks/simple-secret.yml")
+		})
+
+		It("one-off build fails", func() {
+			By("not creating the secret")
+			sess := fly.Start("execute",
+				"-c", "../tasks/simple-secret.yml")
+			<-sess.Exited
+			Expect(sess.ExitCode()).NotTo(Equal(0))
+		})
+	})
+
 	AfterEach(func() {
 		cleanup(releaseName, namespace, proxySession)
 	})
